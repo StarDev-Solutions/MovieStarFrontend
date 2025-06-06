@@ -1,0 +1,55 @@
+name: moviestar
+description: "Movie Star - StarDev Solutions. Uma experiência estelar para amantes do cinema."
+publish_to: 'none'
+version: 0.1.0
+
+environment:
+  sdk: ^3.7.2
+
+dependencies:
+  flutter:
+    sdk: flutter
+  dio: ^5.8.0+1
+  intl: ^0.20.2
+  flutter_svg: ^2.0.14
+  rive: ^0.13.20
+  sizer: ^3.0.5
+  get: ^4.7.2
+  skeletonizer: ^1.4.3
+  flutter_native_splash: ^2.4.5
+  dartz: ^0.10.1
+  equatable: ^2.0.7
+  flutter_rating_bar: ^4.0.1
+  lottie: ^3.3.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+
+#Gera splashScreen da aplicação
+flutter_native_splash:
+  color: "#18181B"
+  image: assets/splash/splash_screen.png
+  android: true
+  ios: true
+
+  android_12:
+    color: "#18181B"
+    image: assets/splash/splash_screen_v12.png
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/images/
+    - assets/fonts/
+    - assets/lotties/
+    - assets/rive/
+    - assets/splash/
+
+  fonts:
+  - family: Axiforma
+    fonts:
+      - asset: assets/fonts/axiforma/Axiforma-Regular.ttf
+      - asset: assets/fonts/axiforma/Axiforma-Medium.ttf
+      - asset: assets/fonts/axiforma/Axiforma-Bold.ttf
