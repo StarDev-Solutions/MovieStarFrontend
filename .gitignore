@@ -33,6 +33,7 @@
 **/.pub/
 **/build/
 **/.env
+**/pubspec.lock
 
 # Symbolication related
 **/app.*.symbols
