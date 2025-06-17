@@ -61,7 +61,7 @@ class _MainAppState extends State<MainApp> {
     await Future.wait([
       precacheImage(const AssetImage('assets/images/placeholder_midia.png'), context),
       precacheImage(const AssetImage('assets/images/spider_man.png'), context),
-      precacheImage(const AssetImage('assets/images/midoria.png'), context),
+      precacheImage(const AssetImage('assets/images/peaky_blinders.png'), context),
     ]);
   }
 }

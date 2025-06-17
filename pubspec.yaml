@@ -15,7 +15,7 @@ dependencies:
   rive: ^0.13.20
   sizer: ^3.0.5
   get: ^4.7.2
-  skeletonizer: ^1.4.3
+  skeletonizer: ^2.0.1
   flutter_native_splash: ^2.4.5
   dartz: ^0.10.1
   equatable: ^2.0.7

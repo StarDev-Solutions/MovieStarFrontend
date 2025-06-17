@@ -32,10 +32,10 @@ class BoxCategoriaSerie extends StatelessWidget {
           ),
           Positioned(
             top: -35.s5 * escala,
-            right: 2.s5 * escala,
+            right: 20.s5 * escala,
             child: Image.asset(
-              'assets/images/midoria.png',
-              width: 122.s5 * escala,
+              'assets/images/peaky_blinders.png',
+              width: 100.s5 * escala,
               fit: BoxFit.fitHeight,
             ),
           ),

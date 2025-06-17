@@ -1,0 +1,96 @@
+name: Gerar APK e Subir no Google Drive
+
+on:
+  pull_request:
+    types: [closed]
+    branches:
+      - main
+
+jobs:
+  update-submodule:
+    if: github.event.pull_request.merged
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v3
+
+      - name: Instalar bibliotecas Python para Google Drive API
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y python3-pip
+          pip install --upgrade google-api-python-client google-auth google-auth-httplib2 google-auth-oauthlib
+          
+      - name: Salvar credenciais da conta de serviço em arquivo
+        run: echo '${{ secrets.GDRIVE_CREDENTIALS }}' > credentials.json
+
+      - name: Validar arquivo credentials.json
+        run: python3 -c 'import json; json.load(open("credentials.json"))'
+
+      - name: Exportar o id da pasta como variável de ambiente
+        run: echo "FOLDER_ID=${{ secrets.GDRIVE_FOLDER_ID }}" >> $GITHUB_ENV
+
+      - name: Exportar SHA do commit como variável de ambiente
+        run: echo "GIT_COMMIT_SHA=${{ github.sha }}" >> $GITHUB_ENV
+
+      - name: Configurar Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.32.2'
+      
+      - name: Cache do Gradle
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: gradle-${{ runner.os }}-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            gradle-${{ runner.os }}-
+
+      - name: Cache do Flutter
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.pub-cache
+            .dart_tool
+          key: flutter-${{ runner.os }}-${{ hashFiles('pubspec.yaml') }}
+          restore-keys: |
+            flutter-${{ runner.os }}-
+
+      - name: Instalar dependências do projeto
+        run: flutter pub get
+
+      - name: Gerar APK release
+        run: flutter build apk --release
+
+      - name: Criar script Python dinamicamente
+        run: |
+          cat <<EOF > upload_to_gdrive.py
+          from google.oauth2 import service_account
+          from googleapiclient.discovery import build
+          from googleapiclient.http import MediaFileUpload
+          import os
+
+          APK_PATH = "build/app/outputs/flutter-apk/app-release.apk"
+          FOLDER_ID = os.environ.get("FOLDER_ID")
+          COMMIT_SHA = os.environ.get("GIT_COMMIT_SHA")
+          APK_FILENAME = f"moviestar-{COMMIT_SHA[:7]}.apk"
+
+          creds = service_account.Credentials.from_service_account_file(
+              "credentials.json",
+              scopes=["https://www.googleapis.com/auth/drive"]
+          )
+
+          service = build('drive', 'v3', credentials=creds)
+
+          file_metadata = {
+              'name': APK_FILENAME,
+              'parents': [FOLDER_ID]
+          }
+
+          media = MediaFileUpload(APK_PATH, mimetype='application/vnd.android.package-archive')
+          file = service.files().create(body=file_metadata, media_body=media, fields='id').execute()
+          EOF
+
+      - name: Executar envio do APK para o Google Drive
+        run: python3 upload_to_gdrive.py
